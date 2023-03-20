@@ -7,7 +7,7 @@ import (
 )
 
 func getIndex(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/main" {
+	if r.URL.Path != "/home" {
 		http.Error(w, "404 not found.", http.StatusNotFound)
 		return
 	}
@@ -50,9 +50,9 @@ func getRemind(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	static := http.FileServer(http.Dir("../client/static"))
-	http.Handle("/*", static);
+	http.Handle("/", static);
 
-	http.HandleFunc("/main", getIndex) 
+	http.HandleFunc("/home", getIndex) 
 	http.HandleFunc("/auth", getAuth) 
 	http.HandleFunc("/remind", getRemind) 
 
