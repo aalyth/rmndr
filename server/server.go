@@ -7,10 +7,16 @@ import (
 )
 
 func getIndex(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/main" {
 		http.Error(w, "404 not found.", http.StatusNotFound)
 		return
 	}
+
+	if r.Method != "GET" {
+        http.Error(w, "Method is not supported.", http.StatusNotFound)
+        return
+    }
+
 	http.ServeFile(w, r, "../client/html/index.html")
 }
 
@@ -19,6 +25,12 @@ func getAuth(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "404 not found.", http.StatusNotFound)
         return
     }
+
+	if r.Method != "GET" {
+        http.Error(w, "Method is not supported.", http.StatusNotFound)
+        return
+    }
+
 	http.ServeFile(w, r, "../client/html/auth.html")
 }
 
@@ -27,13 +39,20 @@ func getRemind(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "404 not found.", http.StatusNotFound)
         return
     }
+
+	if r.Method != "GET" {
+        http.Error(w, "Method is not supported.", http.StatusNotFound)
+        return
+    }
+
 	http.ServeFile(w, r, "../client/html/reminder.html")
 }
 
 func main() {
-	//http.Handle("/", files) 
+	static := http.FileServer(http.Dir("../client/static"))
+	http.Handle("/*", static);
 
-	http.HandleFunc("/", getIndex) 
+	http.HandleFunc("/main", getIndex) 
 	http.HandleFunc("/auth", getAuth) 
 	http.HandleFunc("/remind", getRemind) 
 

@@ -1,0 +1,57 @@
+body {
+	margin: 0;
+	padding-top: 6.75vh;
+
+	background-color: #0C0C0C;
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar {
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 5.75vh;
+
+	position: fixed;
+	display: inline-flex;
+	justify-content: center;
+
+	background-color: #1A1A1A;	
+	gap: 11vw;
+	padding-top: 0.5vh;
+	padding-bottom: 0.5vh;
+}
+
+.navbar-element {
+	display: inline-flex;
+	justify-content: center;
+
+	list-style-type: none;
+	filter: invert(0.3);
+
+	width: 100%;
+	max-width: 3vw;
+	min-width: 6vh;
+	height: 100%;
+}
+
+.navbar-element > img {
+	display: flex;
+	height: 45%;
+	margin-top: 27.5%;
+}
+
+.navbar-plus {
+	background-color: #93f778;
+	border-radius: 50%;
+	filter: invert(0);
+}
+
+.navbar-plus > img{
+	filter: invert(0.3);
+}
+
+.navbar-current > img{
+	filter: invert(1);
+}
