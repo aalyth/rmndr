@@ -6,8 +6,11 @@
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 		<title>My Website</title>
+
 		<link rel="stylesheet" href="/css/style.css">
 		<link rel="stylesheet" href="/css/auth.css">
+
+        <script defer src="/js/auth.js"> </script>
 	</head>
 
 	<body>
@@ -19,13 +22,20 @@
 
 		<div class="auth-container"> 
 			<form class="auth-content"> 
-				<h1> Sign in </h1>
+				<h1 class="auth-title"> Sign up </h1>
 				
 				<label for="username"> Username </label> 
 				<input type="text" id="username" placeholder="Username"> 
 
-				<label for="username"> Password </label>
+				<label for="password"> Password </label>
 				<input type="password" id="password" placeholder="Password">
+
+                <label class="confirm-password-field" for="confirm-password"> Confirm Password </label>
+                <input type="password" id="confirm-password" placeholder="Confirm Password">
+
+                <p class="auth-change"> Already have an account? 
+                    <a href="/auth?mode=SIGN_IN">Sign in</a>
+                </p>
 
 				<button id="submit"> Submit </button>
 			</form>
