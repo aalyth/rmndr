@@ -5,7 +5,7 @@
     padding-top: 3vh;
 
     height: 35vh;
-    width: 42.5vw;
+    width: 37.5vw;
 
     text-align: center;
     justify-content: center;
@@ -43,9 +43,10 @@
 
     margin-top: 5vh;
 
-    width: 40vw;
-    height: 85vh;
-    left: 55vw;
+    width: 37.5vw;
+    height: 60vh;
+    left: 0vw;
+	top: 32.5vh;
 
     text-align: center;
     justify-content: center;
@@ -68,4 +69,31 @@
     left: 10rem;
     height: 42.5%;
     width: 12.5%;
+}
+
+.info-text {
+	position: relative;
+	display: inline-block;
+	margin-top: 3vh;
+	height: 80vh;
+	width: 50vw;
+	left: 41.5vw;
+
+	padding-top: 3vh;
+}
+
+.info-text > h2, .info-text > h4{
+	margin-bottom: 0;
+}
+
+.info-text > h3, .info-text > h4, .info-text > ul{
+	margin-top: 0.5rem;
+}
+
+.info-text > h3, .info-text > h4 {
+	font-size: 1.1rem;
+}
+
+.info-text > ul > li {
+	font-size: 1.15rem;	
 }
