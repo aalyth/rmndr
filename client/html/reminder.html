@@ -7,6 +7,7 @@
 
 		<title>My Website</title>
 		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/reminder.css">
 	</head>
 
 	<body>
@@ -15,8 +16,18 @@
 			<a class="navbar-element navbar-plus"> <img src="/images/plus-selected.png"> </a>
 			<a class="navbar-element" href="/auth"> <img src="/images/logout.png"> </a>
 		</nav>
-		<p> eta reminder </p>
-		<a href="/"> home </a> <br>
-		<a href="/auth"> auth </a> <br>
+
+		<div class="reminder-container"> 
+			<form class="auth-content"> 
+				<h1 class="auth-title"> Add reminder </h1>
+
+				<label for="desc"> Note </label>
+				<input type="desc" id="desc">
+				 
+				<label for="username"> At </label> 
+				<input type="datetime-local" id="username" value="2023-03-27T00:00"> 
+
+				<button id="submit"> Create </button>
+			</form>
 	</body>
 </html>

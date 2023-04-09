@@ -17,7 +17,7 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-	http.ServeFile(w, r, "../client/html/index.html")
+	http.ServeFile(w, r, "../client/html/home.html")
 }
 
 func getAuth(w http.ResponseWriter, r *http.Request) {

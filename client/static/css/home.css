@@ -1,0 +1,99 @@
+.upcoming-notification {
+    display: block;
+    position: fixed;
+
+    padding-top: 3vh;
+
+    height: 35vh;
+    width: 37.5vw;
+
+    text-align: center;
+    justify-content: center;
+}
+
+.notification {
+    display: inline-block;
+	background-color: #93f778;
+    color: black;
+
+    width: 30vw;
+    height: 12.5vh;
+    border-radius: 8px;
+    margin-bottom: 2vh;
+
+    text-align: center;
+}
+
+.notification > h2 {
+    padding-top: 0.5rem;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.notification > h3 {
+    margin-bottom: 2rem;
+}
+
+.notification-list {
+    overflow: scroll;
+    display: inline-block;
+    position: fixed;
+
+    margin-top: 5vh;
+
+    width: 37.5vw;
+    height: 60vh;
+    left: 0vw;
+	top: 32.5vh;
+
+    text-align: center;
+    justify-content: center;
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.notification-list > h1 {
+    margin-top: 0;
+}
+
+.notification-list::-webkit-scrollbar {
+  display: none;
+}
+
+.notification-icon > img{
+    display: flex; 
+    top: 10rem;
+    left: 10rem;
+    height: 42.5%;
+    width: 12.5%;
+}
+
+.info-text {
+	position: relative;
+	display: inline-block;
+	margin-top: 3vh;
+	height: 80vh;
+	width: 50vw;
+	left: 41.5vw;
+
+	padding-top: 3vh;
+}
+
+.info-text > h2, .info-text > h4{
+	margin-bottom: 0;
+}
+
+.info-text > h3, .info-text > h4, .info-text > ul{
+	margin-top: 0.5rem;
+}
+
+.info-text > h3, .info-text > h4 {
+	font-size: 1.1rem;
+}
+
+.info-text > ul > li {
+	font-size: 1.15rem;	
+}
