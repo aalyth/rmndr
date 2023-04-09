@@ -51,3 +51,8 @@ a {
     color: #91f877;
 }
 
+@media (max-width: 690px) {
+	.auth-content {
+		max-width: 21.5rem;
+	}
+}
