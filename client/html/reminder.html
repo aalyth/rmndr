@@ -8,6 +8,7 @@
 		<title>My Website</title>
 		<link rel="stylesheet" href="/css/style.css">
 		<link rel="stylesheet" href="/css/reminder.css">
+		<script defer src="/js/reminder.js"> </script>
 	</head>
 
 	<body>
@@ -22,12 +23,12 @@
 				<h1 class="auth-title"> Add reminder </h1>
 
 				<label for="desc"> Note </label>
-				<input type="desc" id="desc">
+				<input type="text" id="desc">
 				 
 				<label for="username"> At </label> 
 				<input type="datetime-local" id="username" value="2023-03-27T00:00"> 
 
-				<button id="submit"> Create </button>
+				<button type ="button" id="submit"> Create </button>
 			</form>
 	</body>
 </html>
