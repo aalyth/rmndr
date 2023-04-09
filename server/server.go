@@ -56,8 +56,8 @@ func main() {
 	http.HandleFunc("/auth", getAuth) 
 	http.HandleFunc("/remind", getRemind) 
 
-	fmt.Printf("Starting server at port 8080\n")
-    if err := http.ListenAndServe(":8080", nil); err != nil {
+	fmt.Printf("Starting server at port 80\n")
+    if err := http.ListenAndServe(":80", nil); err != nil {
         log.Fatal(err)
     }
 }
