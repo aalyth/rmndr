@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-    "time"
     socketio "github.com/googollee/go-socket.io"
 )
 
@@ -59,18 +58,15 @@ func handleEsp(io socketio.Server, acc string) {
 }
 
 func main() {
+	port := "8080"
 	static := http.FileServer(http.Dir("../client/static"))
 	http.Handle("/", static);
 
 	http.HandleFunc("/home", getIndex) 
 	http.HandleFunc("/auth", getAuth) 
 	http.HandleFunc("/remind", getRemind) 
-    //http.HandleFunc("/esp", connEsp)
 
-    io, err := socketio.NewServer(nil);
-    if err != nil {
-        log.Fatal(err)
-    }
+    io := socketio.NewServer(nil);
 
     /*
     io.OnEvent("/", "connection", func (socket socketio.Socket) {
@@ -94,12 +90,16 @@ func main() {
         log.Println("device disconnected: ", socket.ID())
     })
 
-    io.OnEvent("/", "connectAccount", func (socket socketio.Conn, acc string) {
-        
+    io.OnEvent("/", "paca", func (socket socketio.Conn, acc string) {
+       	fmt.Printf("paca") 
     });
 
-	fmt.Printf("Starting server at port 80\n")
-    if err := http.ListenAndServe(":80", nil); err != nil {
+	go func() {
+        log.Fatal(io.Serve())
+    }()
+
+	fmt.Printf("Starting server at port: " + port + "\n")
+    if err := http.ListenAndServe(":" + port, nil); err != nil {
         log.Fatal(err)
     }
 }
