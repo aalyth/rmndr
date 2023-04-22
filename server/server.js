@@ -1,5 +1,6 @@
 // const database = require('./db.js');
 
+var WebSocketServer = require('websocket').server;
 const express = require('express');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
@@ -7,6 +8,10 @@ const { Server } = require("socket.io");
 const app = express();
 
 const httpServer = createServer(app);
+wsServer = new WebSocketServer({
+	httpServer: httpServer,
+	autoAcceptConnections: false
+});
 const io = new Server(httpServer);
 
 const port = 8080;
@@ -25,6 +30,7 @@ app.get('/reminder', (req, res) => {
 	res.sendFile('/client/html/reminder.html', { root: './' });
 });
 
+response = '';
 io.on('connection', (socket) => {
 	console.log('a user connected');
 	socket.room = '';
@@ -33,51 +39,45 @@ io.on('connection', (socket) => {
 		console.log('user disconnected');
 	});
 
-	socket.on('paca', () => {
-		console.log('paca');
+	socket.on('paca', (msg) => {
+		console.log('paca from ' + msg);
 	});
-
-	/*
-	socket.on('sendMessage', async (msg, author) => {
-		await database.post_message(socket.room, author, msg)
-		socket.to(socket.room).emit('receiveMessage', msg, author);
+	
+	socket.on('remind', (msg) => {
+		response = msg;
 	});
-
-	socket.on('changeRoom', (newRoom) => {
-		if (socket.room != '') socket.leave(socket.room);
-		console.log('left ' + socket.room + ' and joined ' + newRoom);
-		socket.join(newRoom);
-		socket.room = newRoom;
-	});
-
-	socket.on('login', async (username, password) => {
-		var res = await database.login_user(username, password);
-		socket.emit('login_resp', res);
-	});
-
-	socket.on('register', async (username, password) => {
-		var res = await database.register_user(username, password);
-		socket.emit('register_resp', res);
-	})
-
-	socket.on('get_user_rooms', async(user) => {
-		var res = await database.get_user_rooms(user);
-		socket.emit('post_user_rooms', res);
-	});
-
-	socket.on('createChatroom', async (user, name, members) => {
-		var res = await database.create_room(name, user, members, false);		
-		socket.emit('createChatroomResponse', res);
-	});
-
-	socket.on('load_messages', async(lower_limit, upper_limit) => {
-		if(socket.room != ''){
-			var res = await database.load_messages(socket.room, lower_limit, upper_limit);
-			socket.emit('post_messages', res);
-		}
-	});
-	*/
 });
+
+wsServer.on('request', (request) => {
+	if (request.resource === '/esp') {
+		const connection = request.accept(null, request.origin);
+		console.log('WebSocket connection established');
+
+		connection.on('message', (message) => {
+			// console.log('Received message:', message.utf8Data);
+			if (message.utf8Data == 'getNotification') {
+				// get the notification string from the db and send it via
+
+			} else if (response != '') {
+				// startAlarm -> starts the alarm
+				// changeNotification <msg> -> changes the notification message
+
+				connection.send(response);
+				response = '';
+				//connection.send('changeNotification     pacanui        at 07:00    ');
+				//connection.send('startAlarm');
+			}
+		});
+
+		connection.on('close', () => {
+			console.log('WebSocket connection closed');
+		});
+
+	} else {
+		request.reject();
+	}
+});
+
 
 httpServer.listen(port, () => {
 	console.log(`Server running on ${port}`)

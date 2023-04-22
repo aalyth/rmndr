@@ -1,2 +1,2 @@
 const socket = io();
-socket.emit("paca");
+socket.emit('remind');
