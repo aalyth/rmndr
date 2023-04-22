@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
 			return centeredText;
 		}
 
-		socket.io.emit('esp_receive', centerText(content+time))
+		socket.emit('esp_send', centerText(content+time));
 		
 	});
 
@@ -100,17 +100,23 @@ io.on('connection', (socket) => {
 		socket.emit('receive_time', time);
 	})
 
-	// socket.on('createChatroom', async (user, name, members) => {
-	// 	var res = await database.create_room(name, user, members, false);		
-	// 	socket.emit('createChatroomResponse', res);
-	// });
+	socket.on('delete_notification', async(user_id, time) => {
+		await database.delete_notification(user_id, time);
+	})
 
-	// socket.on('load_messages', async(lower_limit, upper_limit) => {
-	// 	if(socket.room != ''){
-	// 		var res = await database.load_messages(socket.room, lower_limit, upper_limit);
-	// 		socket.emit('post_messages', res);
-	// 	}
-	// });
+	socket.on('has_notifications', async(user_id) => {
+		var res = await database.has_notifications(user_id);
+		socket.emit('notifications_fetch_result', res);
+	})
+
+	socket.on('esp_receive', async(str) => {
+		receive = 'changeNotification' + str;
+	})
+
+	socket.on('start_alarm', async() => {
+		receive = 'startAlarm';
+	})
+	
 	
 });
 
@@ -121,10 +127,8 @@ wsServer.on('request', (request) => {
 
 		connection.on('message', (message) => {
 			// console.log('Received message:', message.utf8Data);
-			if (message.utf8Data == 'getNotification') {
+			if (message.utf8Data == 'getNotification' || response != '') {
 				// get the notification string from the db and send it via
-
-			} else if (response != '') {
 				// startAlarm -> starts the alarm
 				// changeNotification <msg> -> changes the notification message
 

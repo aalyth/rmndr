@@ -116,7 +116,23 @@ async function load_notifications(user_id, lower_limit, upper_limit){
 	return sortedRes = res.slice(lower_limit, upper_limit+1);
 }
 
-module.exports = {cassandra, client, connect, register_user, login_user, post_notification, load_notifications};
+async function delete_notification(user_id, time){
+    const params = [user_id, time];
+    const query = 'DELETE FROM app_data.notification WHERE user_id = ? AND time = ?'
+
+    client.execute(query, params);
+}
+
+async function has_notification(user_id){
+    const params = [user_id, time];
+    const query = 'SELECT * FROM app_data.notification WHERE user_id = ?'
+
+    var hasNotifications =  !( (await client.execute(query, params)).rows.length == 0 )
+
+    return hasNotifications;
+}
+
+module.exports = {cassandra, client, connect, register_user, login_user, post_notification, load_notifications, delete_notification, has_notification};
 
 connect();
 
