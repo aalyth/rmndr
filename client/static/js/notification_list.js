@@ -60,7 +60,7 @@ async function load_messages(){
 
             socket.emit('delete_notification', user, curr_notif.toISOString());
             socket.emit('has_notifications', user);
-            socket.on('notification_fetch_result',  async (res) => {
+            socket.on('notifications_fetch_result',  async (res) => {
                 if(!res) clearInterval(intervalId);
             })
 
