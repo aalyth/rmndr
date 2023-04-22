@@ -20,3 +20,5 @@ if (MODE === 'SIGN_IN') {
     confirmPasswordLabel.remove();
     confirmPasswordInput.remove();
 } 
+
+

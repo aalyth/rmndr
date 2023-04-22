@@ -71,7 +71,7 @@ async function login_user(username, password){
 }
 
 
-async function post_notification(username, content){
+async function post_notification(username, time, content){
     
     var res = await check_user(username);
     
@@ -82,8 +82,8 @@ async function post_notification(username, content){
 		}
     }
 
-    const params = [username, content];
-    const query = "INSERT INTO notification (user_id, time, content, notification_id) VALUES (?, toUnixTimestamp(now()), ? , uuid())";
+    const params = [username, time, content];
+    const query = "INSERT INTO notification (user_id, time, content, notification_id) VALUES (?, ?, ?, uuid())";
 
     client.execute(query, params);
 
@@ -107,13 +107,20 @@ async function load_notifications(user_id, lower_limit, upper_limit){
 		return { 
             id: row.notification_id,
 			content: row.content,
-			time: row.time
+			time: new Date(row.time).getTime()
 		};
 	});
 
-	return res.slice(lower_limit, upper_limit+1);
+    sortedRes = res.sort((a, b) => a.time - b.time);
+
+	return sortedRes = res.slice(lower_limit, upper_limit+1);
 }
 
-connect()
+module.exports = {cassandra, client, connect, register_user, login_user, post_notification, load_notifications};
+
+connect();
+
+
+
 
 
