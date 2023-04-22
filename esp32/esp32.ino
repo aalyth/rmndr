@@ -2,12 +2,12 @@
 
 #include <WebSocketClient.h>
 
-const char* ssid     = "<your_wifi_ssid>";
-const char* password = "<your_wifi_password>";
+const char* ssid     = "Redmi 9T";
+const char* password = "asdfghjkl";
 
-char path[] = "/";
-char host[] = "xxx.xxx.xxx.xxx";
-int port = 0000;
+char path[] = "/esp";
+char host[] = "http://192.168.207.12/";
+int port = 8080;
   
 WebSocketClient webSocketClient;
 WiFiClient client;
