@@ -53,14 +53,14 @@ async function load_messages(){
          // set up the interval to switch the upcoming notification
          intervalId = setInterval(() => {
             
-            socket.emit('connect_esp', user);
+            socket.emit('connect_esp', res[0].content);
             socket.on('esp_send', async (str) => {
                 socket.emit('esp_receive', str);
             });
 
             socket.emit('delete_notification', user, curr_notif.toISOString());
             socket.emit('has_notifications', user);
-            socket.on('notification_fetch_result',  async (res) => {
+            socket.on('notifications_fetch_result',  async (res) => {
                 if(!res) clearInterval(intervalId);
             })
 
