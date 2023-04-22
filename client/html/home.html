@@ -9,52 +9,27 @@
 
 		<link rel="stylesheet" type="text/css" href="/css/style.css"/>
 		<link rel="stylesheet" type="text/css" href="/css/home.css"/>
+		<script defer src="/socket.io/socket.io.js"></script>
+		<script defer src="/js/logout.js"> </script>
 		<script defer src="/js/notification_list.js"> </script>
 	</head>
 
 	<body>
 		<nav class="navbar">
-			<a class="navbar-element navbar-current"> <img src="/images/calendar-selected.png"> </a>
-			<a class="navbar-element navbar-plus" href="/remind"> <img  src="/images/plus.png"> </a>
-			<a class="navbar-element" href="/auth"> <img src="/images/logout.png"> </a>
+			<a id = "home" class="navbar-element navbar-current"> <img src="/images/calendar-selected.png"> </a>
+			<a id = "remind" class="navbar-element navbar-plus" href="/remind"> <img  src="/images/plus.png"> </a>
+			<a id = "sign_out" class="navbar-element" href="/auth"> <img src="/images/logout.png"> </a>
 		</nav>
 
 
         <div class="upcoming-notification"> 
             <h1> Upcoming reminder </h1>
-            <div class="notification"> 
-                <h2> notification 1 </h2>
-                <h3> at 09.04.2023-15:48 </h3>
-            </div>
         </div>
 
         <div class="notification-list"> 
             <h1> All reminders </h1>
 			
-			<div class="notification" style="display: none"> 
-                <h2> ewguiearhoi </h2>
-                <h3> at 09.04.2023-15:48 </h3>
-            </div>
-
-            <div class="notification"> 
-                <h2> notification 1 </h2>
-                <h3> at 09.04.2023-15:48 </h3>
-            </div>
-
-            <div class="notification"> 
-                <h2> notification 2 </h2>
-                <h3> at 09.04.2023-15:49 </h3>
-            </div>
 			
-            <div class="notification"> 
-                <h2> notification 3 </h2>
-                <h3> at 09.04.2023-15:50 </h3>
-            </div>
-
-            <div class="notification"> 
-                <h2> notification 4 </h2>
-                <h3> at 09.04.2023-15:51 </h3>
-            </div>
         </div>
 
         <div class="info-text"> 

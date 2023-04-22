@@ -1,37 +1,67 @@
+if (!!localStorage.getItem('USER')){
+    console.log("item")
+    window.location.href = '/';	
+}
+
 function get_location(){
     return window.location.href;
 }
 
 var submit = document.getElementById("submit");
 var current_url = get_location();
+var socket = io();
+
 var username = document.getElementById("username");
 var password = document.getElementById("password");
 
+
 if (current_url == "http://localhost:8080/auth?mode=SIGN_UP"){
-    console.log("huinq");
-    var confirm_password = document.getElementById("confirm-password");
-    submit.addEventListener("click", function(){
     
-            if(confirm_password.value == password.value){
-                localStorage.setItem("USERNAME", username.value);
-                localStorage.setItem("PASSWORD", password.value)
-                window.location.href = "/auth"
-            }
-            else {
-                alert("Password mismatch");
-            }
-    })
+    var confirm_password = document.getElementById("confirm-password");
+
+    submit.addEventListener('click', async function(){
+
+        var username_value = username.value;
+        var password_value = password.value;
+        var confirm_password_value = confirm_password.value;
+    
+        console.log(username_value, password_value, confirm_password_value);
+    
+        let res = await validate('register', username_value, password_value, confirm_password_value);
+    
+        if(!res){
+            clear_form();
+            return;
+        }
+    
+        res = await authenticate(socket, 'register', username_value, password_value);
+    
+        if(!res){
+            clear_form();
+            return;
+        }
+    
+    });
 }
 
 if (current_url == "http://localhost:8080/auth?mode=SIGN_IN" || current_url == "http://localhost:8080/auth"){
-    console.log("drug kur")
-    submit.addEventListener("click", function(){
-        console.log("clicj!")
-        if(localStorage.getItem("USERNAME") == username.value && localStorage.getItem("PASSWORD") == password.value){
-            window.location.href = "/remind"
+    
+    submit.addEventListener('click', async function(){
+        var username_value = username.value;
+        var password_value = password.value;
+    
+        let res = await validate('login', username_value, password_value);
+    
+        if(!res){
+            clear_form();
+            return;
         }
-        else{
-            alert ("Invalid password or username");
+    
+        res = await authenticate(socket, 'login', username_value, password_value);
+    
+        if(!res){
+            clear_form();
+            return;
         }
-    })
+    });
 }
