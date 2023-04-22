@@ -10,48 +10,26 @@
 		<link rel="stylesheet" type="text/css" href="/css/style.css"/>
 		<link rel="stylesheet" type="text/css" href="/css/home.css"/>
 		<script defer src="/socket.io/socket.io.js"></script>
+		<script defer src="/js/logout.js"> </script>
 		<script defer src="/js/notification_list.js"> </script>
-		<script defer src="/js/home.js"> </script>
 	</head>
 
 	<body>
 		<nav class="navbar">
-			<a class="navbar-element navbar-current"> <img src="/images/calendar-selected.png"> </a>
-			<a class="navbar-element navbar-plus" href="/remind"> <img  src="/images/plus.png"> </a>
-			<a class="navbar-element" href="/auth"> <img src="/images/logout.png"> </a>
+			<a id = "home" class="navbar-element navbar-current"> <img src="/images/calendar-selected.png"> </a>
+			<a id = "remind" class="navbar-element navbar-plus" href="/remind"> <img  src="/images/plus.png"> </a>
+			<a id = "sign_out" class="navbar-element" href="/auth"> <img src="/images/logout.png"> </a>
 		</nav>
 
 
         <div class="upcoming-notification"> 
             <h1> Upcoming reminder </h1>
-            <div class="notification"> 
-                <h2> MOPR test </h2>
-                <h3> at 07.04.2023-15:10 </h3>
-            </div>
         </div>
 
         <div class="notification-list"> 
             <h1> All reminders </h1>
 			
-			<div class="notification" style="display: none"> 
-                <h2> ewguiearhoi </h2>
-                <h3> at 09.04.2023-15:48 </h3>
-            </div>
-
-            <div class="notification"> 
-                <h2> MOPR test </h2>
-                <h3> at 07.04.2023-15:10 </h3>
-            </div>
-
-            <div class="notification"> 
-                <h2> TUESFest </h2>
-                <h3> at 23.04.2023-10:00 </h3>
-            </div>
-
-            <div class="notification"> 
-                <h2> OS test </h2>
-                <h3> at 24.04.2023-14:30 </h3>
-            </div>
+			
         </div>
 
         <div class="info-text"> 

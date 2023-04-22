@@ -1,4 +1,4 @@
-// const database = require('./db.js');
+ const database = require('./database.js');
 
 const express = require('express');
 const { createServer } = require("http");
@@ -18,10 +18,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/auth', (req, res) => {
-	res.sendFile('/client/html/login.html', { root: './' });
+	res.sendFile('/client/html/auth.html', { root: './' });
 });
 
-app.get('/reminder', (req, res) => {
+app.get('/remind', (req, res) => {
 	res.sendFile('/client/html/reminder.html', { root: './' });
 });
 
@@ -33,21 +33,40 @@ io.on('connection', (socket) => {
 		console.log('user disconnected');
 	});
 
-	socket.on('paca', () => {
-		console.log('paca');
+	socket.on('connect_esp', async (username) => {
+		
+		latest_notification = await database.load_notifications(username, 0, 30)[0];
+		time = latest_notification.time;
+		content = latest_notification.time;
+
+		function centerText(text) {
+
+			if (text.length > 14) {
+			  text = text.substring(0, 14);
+			}
+
+			const totalSpaces = 16 - text.length;
+			const leftSpaces = Math.floor(totalSpaces / 2);
+			const rightSpaces = totalSpaces - leftSpaces;
+			const centeredText = " ".repeat(leftSpaces) + text + " ".repeat(rightSpaces);
+			 
+			return centeredText;
+		}
+
+		socket.io.emit('esp_receive', centerText(content+time))
+		
 	});
 
-	/*
-	socket.on('sendMessage', async (msg, author) => {
-		await database.post_message(socket.room, author, msg)
-		socket.to(socket.room).emit('receiveMessage', msg, author);
-	});
+	
+	 socket.on('postNotification', async (user, time, content) => {
+	 	await database.post_notification(user, time, content);
+	 });
 
-	socket.on('changeRoom', (newRoom) => {
+	socket.on('changeRoom', async (newRoom) => {
 		if (socket.room != '') socket.leave(socket.room);
 		console.log('left ' + socket.room + ' and joined ' + newRoom);
-		socket.join(newRoom);
-		socket.room = newRoom;
+	 	socket.join(newRoom);
+	 	socket.room = newRoom;
 	});
 
 	socket.on('login', async (username, password) => {
@@ -60,25 +79,33 @@ io.on('connection', (socket) => {
 		socket.emit('register_resp', res);
 	})
 
-	socket.on('get_user_rooms', async(user) => {
-		var res = await database.get_user_rooms(user);
-		socket.emit('post_user_rooms', res);
+	
+
+	 socket.on('get_notifications', async(user, lower_bound, upper_bound) => {
+		var res = await database.load_notifications(user, lower_bound, upper_bound);
+		socket.emit('post_notifications', res);
 	});
 
-	socket.on('createChatroom', async (user, name, members) => {
-		var res = await database.create_room(name, user, members, false);		
-		socket.emit('createChatroomResponse', res);
-	});
+	socket.on('get_time', async(time) => {
+		socket.emit('receive_time', time);
+	})
 
-	socket.on('load_messages', async(lower_limit, upper_limit) => {
-		if(socket.room != ''){
-			var res = await database.load_messages(socket.room, lower_limit, upper_limit);
-			socket.emit('post_messages', res);
-		}
-	});
-	*/
+	// socket.on('createChatroom', async (user, name, members) => {
+	// 	var res = await database.create_room(name, user, members, false);		
+	// 	socket.emit('createChatroomResponse', res);
+	// });
+
+	// socket.on('load_messages', async(lower_limit, upper_limit) => {
+	// 	if(socket.room != ''){
+	// 		var res = await database.load_messages(socket.room, lower_limit, upper_limit);
+	// 		socket.emit('post_messages', res);
+	// 	}
+	// });
+	
 });
 
 httpServer.listen(port, () => {
 	console.log(`Server running on ${port}`)
 });
+
+database.load_notifications("test", 0, 30)
