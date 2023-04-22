@@ -2,12 +2,12 @@
 
 #include <WebSocketClient.h>
 
-const char* ssid     = "<your_wifi_ssid>";
-const char* password = "<your_wifi_password>";
+const char* ssid     = "Redmi 9T";
+const char* password = "asdfghjkl";
 
-char path[] = "/";
-char host[] = "xxx.xxx.xxx.xxx";
-int port = 0000;
+char path[] = "/esp";
+char host[] = "192.168.207.12";
+int port = 80;
   
 WebSocketClient webSocketClient;
 WiFiClient client;
@@ -26,7 +26,6 @@ void setup() {
   pinMode(BUZZER, OUTPUT);
   lcd.begin();
   lcd.backlight();
-
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -42,7 +41,6 @@ void setup() {
   Serial.println("WiFi connected");  
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-
   delay(5000);
 
   // Connect to the websocket server
@@ -91,7 +89,7 @@ void parse_response(String response) {
     String bottom_row = arg.substring(16, arg.length());
     Serial.println("top_row: " + top_row);
     Serial.println("bottom_row: " + bottom_row);
-    
+
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(top_row);
