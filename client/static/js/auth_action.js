@@ -15,12 +15,13 @@ var username = document.getElementById("username");
 var password = document.getElementById("password");
 
 
-if (current_url == "http://localhost:8080/auth?mode=SIGN_UP"){
+if (MODE == 'SIGN_UP'){
     
     var confirm_password = document.getElementById("confirm-password");
 
     submit.addEventListener('click', async function(){
 
+        console.log('click');
         var username_value = username.value;
         var password_value = password.value;
         var confirm_password_value = confirm_password.value;
@@ -44,7 +45,7 @@ if (current_url == "http://localhost:8080/auth?mode=SIGN_UP"){
     });
 }
 
-if (current_url == "http://localhost:8080/auth?mode=SIGN_IN" || current_url == "http://localhost:8080/auth"){
+if (MODE == 'SIGN_IN'){
     
     submit.addEventListener('click', async function(){
         var username_value = username.value;

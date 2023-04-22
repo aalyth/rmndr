@@ -3,18 +3,20 @@ const database = require('./database.js');
 var WebSocketServer = require('websocket').server;
 const express = require('express');
 const { createServer } = require("http");
-const { Server } = require("socket.io");
+// const { Server } = require("socket.io");
 
 const app = express();
+const srv = require("http").Server(app);
 
 const httpServer = createServer(app);
 wsServer = new WebSocketServer({
 	httpServer: httpServer,
 	autoAcceptConnections: false
 });
-const io = new Server(httpServer);
+// const io = new Server(httpServer);
+const io = require("socket.io")(srv);
 
-const port = 8080;
+const port = 80;
 
 app.use(express.static('./client/static'));
 
@@ -101,7 +103,7 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('has_notifications', async(user_id) => {
-		var res = await database.has_notifications(user_id);
+		var res = await database.has_notification(user_id);
 		socket.emit('notifications_fetch_result', res);
 	})
 
@@ -145,7 +147,7 @@ wsServer.on('request', (request) => {
 });
 
 
-httpServer.listen(port, () => {
+srv.listen(port, () => {
 	console.log(`Server running on ${port}`)
 });
 
