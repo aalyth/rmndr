@@ -1,4 +1,4 @@
- const database = require('./database.js');
+const database = require('./database.js');
 
 var WebSocketServer = require('websocket').server;
 const express = require('express');
