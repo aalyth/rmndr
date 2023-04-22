@@ -53,7 +53,7 @@ async function load_messages(){
          // set up the interval to switch the upcoming notification
          intervalId = setInterval(() => {
             
-            socket.emit('connect_esp', user);
+            socket.emit('connect_esp', res[0].content);
             socket.on('esp_send', async (str) => {
                 socket.emit('esp_receive', str);
             });

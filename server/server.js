@@ -1,4 +1,4 @@
- const database = require('./database.js');
+const database = require('./database.js');
 
 var WebSocketServer = require('websocket').server;
 const express = require('express');
@@ -43,12 +43,8 @@ io.on('connection', (socket) => {
 		response = msg;
 	});
 
-	socket.on('connect_esp', async (username) => {
+	socket.on('connect_esp', async (notification, time) => {
 		
-		latest_notification = await database.load_notifications(username, 0, 30)[0];
-		time = latest_notification.time;
-		content = latest_notification.time;
-
 		function centerText(text) {
 
 			if (text.length > 14) {
@@ -63,7 +59,7 @@ io.on('connection', (socket) => {
 			return centeredText;
 		}
 
-		socket.emit('esp_send', centerText(content+time));
+		socket.emit('esp_send', centerText(notification+time));
 		
 	});
 
