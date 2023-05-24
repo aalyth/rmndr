@@ -10,11 +10,21 @@ const srv = require("http").Server(app);
 
 const httpServer = createServer(app);
 wsServer = new WebSocketServer({
-	httpServer: httpServer,
+	httpServer: srv,
 	autoAcceptConnections: false
 });
 // const io = new Server(httpServer);
 const io = require("socket.io")(srv);
+
+const SerialPort = require('serialport').SerialPort;
+var esp = new SerialPort({
+    path: 'COM8',  
+    baudRate: 115200,
+    autoOpen: false,
+});
+esp.open((e) => {
+    console.log(`serial error: ${e}`);
+});
 
 const port = 80;
 
@@ -32,7 +42,6 @@ app.get('/remind', (req, res) => {
 	res.sendFile('/client/html/reminder.html', { root: './' });
 });
 
-response = '';
 io.on('connection', (socket) => {
 	console.log('a user connected');
 	socket.room = '';
@@ -43,28 +52,18 @@ io.on('connection', (socket) => {
 
 	socket.on('remind', (msg) => {
 		response = msg;
+        esp.write('huj');
+        console.log('writing huj');
 	});
 
-	socket.on('connect_esp', async (notification, time) => {
-		
-		function centerText(text) {
-
-			if (text.length > 14) {
-			  text = text.substring(0, 14);
-			}
-
-			const totalSpaces = 16 - text.length;
-			const leftSpaces = Math.floor(totalSpaces / 2);
-			const rightSpaces = totalSpaces - leftSpaces;
-			const centeredText = " ".repeat(leftSpaces) + text + " ".repeat(rightSpaces);
-			 
-			return centeredText;
-		}
-
-		socket.emit('esp_send', centerText(notification+time));
-		
+	socket.on('esp_notification', (notification, time) => {
+        esp.write('cN ' + notification + ' ' + time);
 	});
 
+	socket.on('esp_alarm', () => {
+        console.log('we start the alarm');
+        esp.write('startAlarm');
+	})
 	
 	 socket.on('postNotification', async (user, time, content) => {
 	 	await database.post_notification(user, time, content);
@@ -87,8 +86,6 @@ io.on('connection', (socket) => {
 		socket.emit('register_resp', res);
 	})
 
-	
-
 	 socket.on('get_notifications', async(user, lower_bound, upper_bound) => {
 		var res = await database.load_notifications(user, lower_bound, upper_bound);
 		socket.emit('post_notifications', res);
@@ -100,52 +97,17 @@ io.on('connection', (socket) => {
 
 	socket.on('delete_notification', async(user_id, time) => {
 		await database.delete_notification(user_id, time);
+        console.log('we deleted the notification');
+        console.log('we start the alarm');
+        esp.write('startAlarm');
 	})
 
 	socket.on('has_notifications', async(user_id) => {
 		var res = await database.has_notification(user_id);
 		socket.emit('notifications_fetch_result', res);
 	})
-
-	socket.on('esp_receive', async(str) => {
-		receive = 'changeNotification' + str;
-	})
-
-	socket.on('start_alarm', async() => {
-		receive = 'startAlarm';
-	})
-	
 	
 });
-
-wsServer.on('request', (request) => {
-	if (request.resource === '/esp') {
-		const connection = request.accept(null, request.origin);
-		console.log('WebSocket connection established');
-
-		connection.on('message', (message) => {
-			// console.log('Received message:', message.utf8Data);
-			if (message.utf8Data == 'getNotification' || response != '') {
-				// get the notification string from the db and send it via
-				// startAlarm -> starts the alarm
-				// changeNotification <msg> -> changes the notification message
-
-				connection.send(response);
-				response = '';
-				//connection.send('changeNotification     pacanui        at 07:00    ');
-				//connection.send('startAlarm');
-			}
-		});
-
-		connection.on('close', () => {
-			console.log('WebSocket connection closed');
-		});
-
-	} else {
-		request.reject();
-	}
-});
-
 
 srv.listen(port, () => {
 	console.log(`Server running on ${port}`)
