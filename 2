@@ -1,5 +1,6 @@
-// const database = require('./database.js');
+const database = require('./database.js');
 
+var WebSocketServer = require('websocket').server;
 const express = require('express');
 const { createServer } = require("http");
 // const { Server } = require("socket.io");
@@ -8,10 +9,10 @@ const app = express();
 const srv = require("http").Server(app);
 
 const httpServer = createServer(app);
-const connections = {}; // this maps usernames to connected 
-const WebSocket = require('ws');
-const wsServer = new WebSocket.WebSocketServer({ port: 8080 });
-
+wsServer = new WebSocketServer({
+	httpServer: httpServer,
+	autoAcceptConnections: false
+});
 // const io = new Server(httpServer);
 const io = require("socket.io")(srv);
 
@@ -65,7 +66,6 @@ io.on('connection', (socket) => {
 	});
 
 	
-	/*
 	 socket.on('postNotification', async (user, time, content) => {
 	 	await database.post_notification(user, time, content);
 	 });
@@ -86,7 +86,9 @@ io.on('connection', (socket) => {
 		var res = await database.register_user(username, password);
 		socket.emit('register_resp', res);
 	})
+
 	
+
 	 socket.on('get_notifications', async(user, lower_bound, upper_bound) => {
 		var res = await database.load_notifications(user, lower_bound, upper_bound);
 		socket.emit('post_notifications', res);
@@ -104,29 +106,51 @@ io.on('connection', (socket) => {
 		var res = await database.has_notification(user_id);
 		socket.emit('notifications_fetch_result', res);
 	})
-	*/
+
+	socket.on('esp_receive', async(str) => {
+		receive = 'changeNotification' + str;
+	})
+
+	socket.on('start_alarm', async() => {
+		receive = 'startAlarm';
+	})
+	
+	
 });
 
-const interval = setInterval(function ping() {
-	wsServer.clients.forEach(function each(ws) {
-		if (ws.isAlive === false) return ws.terminate();
-
-		ws.isAlive = false;
-		ws.ping();
-	});
-}, 600);
-
-function heartbeat() {
-	this.isAlive = true;
-}
-
+const connections = {}; // this maps usernames to connected 
 wsServer.on('connection', (ws) => {
-	ws.isAlive = true;
+	/*
+	if (request.resource === '/esp') {
+		const connection = request.accept(null, request.origin);
+		console.log('WebSocket connection established');
+
+		connection.on('message', (message) => {
+			// console.log('Received message:', message.utf8Data);
+			if (message.utf8Data == 'getNotification' || response != '') {
+				// get the notification string from the db and send it via
+				// startAlarm -> starts the alarm
+				// changeNotification <msg> -> changes the notification message
+
+				connection.send(response);
+				response = '';
+				//connection.send('changeNotification     pacanui        at 07:00    ');
+				//connection.send('startAlarm');
+			}
+		});
+
+		connection.on('close', () => {
+			console.log('WebSocket connection closed');
+		});
+
+	} else {
+		request.reject();
+	}
+	*/
 	ws.on('error', console.error);
-	ws.on('pong', heartbeat);
 
 	ws.on('message', (msg) => {
-		username = msg.toString().split(' ')[0]; // this gets the first word of the message
+		username = msg.split(' ')[0]; // this gets the first word of the message
 
 		ws.username = username;
 		if (!connections.hasOwnProperty(username)) {
@@ -136,21 +160,16 @@ wsServer.on('connection', (ws) => {
 			connections[username].push(ws);
 		}
 		
-		console.log('table after coming: \n');
-		console.log(connections);
 	});
 
 	ws.on('close', () => {
-		console.log('we exit');
 		connections[ws.username].splice(ws, 1);
-		
-		console.log('table after leaving: \n');
-		console.log(connections);
 	});
 });
+
 
 srv.listen(port, () => {
 	console.log(`Server running on ${port}`)
 });
 
-// database.load_notifications("test", 0, 30)
+database.load_notifications("test", 0, 30)
