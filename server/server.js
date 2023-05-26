@@ -1,4 +1,5 @@
-// const database = require('./database.js');
+const { time } = require('console');
+const database = require('./database.js');
 
 const express = require('express');
 const { createServer } = require("http");
@@ -64,7 +65,6 @@ io.on('connection', (socket) => {
         esp.write('startAlarm');
 	})
 	
-	/*
 	 socket.on('postNotification', async (user, time, content) => {
 	 	await database.post_notification(user, time, content);
 	 });
@@ -107,8 +107,28 @@ io.on('connection', (socket) => {
 		var res = await database.has_notification(user_id);
 		socket.emit('notifications_fetch_result', res);
 	})
-	*/
+
+	setInterval(async function(){
+		var options = { hour12: false };
+    	var dateValue = new Date(date.value).toLocaleString('en-US', options);
+    	dateValue = dateValue.slice(0, -3);
+		var notifications = await database.fetch_timestamped_notifications(dateValue);
+		if(notifications != null ){
+			for (var notification of notifications){
+				await database.delete_notification(notification.user_id, notification.time)
+			}
+		}
+		socket.emit('refresh_list');
+	}, 30000);
+	
 });
+
+
+setInterval(function(){
+	var curr_time = new Date().toLocaleTimeString();
+	socket.emit('refresh_list');
+}, 30000);
+
 
 const interval = setInterval(function ping() {
 	wsServer.clients.forEach(function each(ws) {

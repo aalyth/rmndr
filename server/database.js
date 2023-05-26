@@ -132,7 +132,25 @@ async function has_notification(user_id){
     return hasNotifications;
 }
 
-module.exports = {cassandra, client, connect, register_user, login_user, post_notification, load_notifications, delete_notification, has_notification};
+async function fetch_timestamped_notifications(time){
+	const params = [time]
+	const query = 'SELECT * FROM app_data.notification WHERE time = ? ALLOW FILTERING'
+
+	var notifications = await client.execute(query, params)
+	var hasNotifications =  !( notifications.rows.length == 0 )
+
+	if(hasNotifications){
+		var res = (notifications.rows.map((row) => {
+			return {
+				user_id : row.user_id,
+				time : row.time
+			}
+		}));
+		return res;
+	}
+	return null;
+}
+module.exports = {cassandra, client, connect, register_user, login_user, post_notification, load_notifications, delete_notification, has_notification, fetch_timestamped_notifications};
 
 connect();
 

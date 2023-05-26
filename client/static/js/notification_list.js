@@ -46,23 +46,33 @@ async function load_messages(){
         }
 
         upper+=30;
+        
 
-        // calculate the interval
-        var curr_time = new Date().getTime();
-        var curr_notif = new Date(res[0].time);
-        var curr_notif_time = curr_notif.getTime();
-        var interval = curr_notif_time - curr_time;
-
-        // set up the interval to switch the upcoming notification
-        socket.emit('has_notifications', user);
-        socket.on('notifications_fetch_result',  async (res) => {
-            if(res) {
-                setTimeout(() => {
-                    socket.emit('delete_notification', user, curr_notif.toISOString());
-                    location.reload();
-                }, interval);
-            }
-        })
+        socket.on('refresh_list', async () => {
+            location.reload();
+        });
+        // var notification = {
+        //     curr_time : new Date().getTime(),
+        //     curr_notif : new Date(res[0].time),
+        //     curr_notif_time : curr_notif.getTime(),
+        //     interval : curr_notif_time - curr_time
+        // }
+        // // // calculate the interval
+        // // var curr_time = new Date().getTime();
+        // // var curr_notif = new Date(res[0].time);
+        // // var curr_notif_time = curr_notif.getTime();
+        // // var interval = curr_notif_time - curr_time;
+        // socket.emit('notify', notification, user)
+        // // set up the interval to switch the upcoming notification
+        // socket.emit('has_notifications', user);
+        // socket.on('notifications_fetch_result',  async (res) => {
+        //     if(res) {
+        //         setTimeout(() => {
+        //             socket.emit('delete_notification', user, curr_notif.toISOString());
+        //             location.reload();
+        //         }, interval);
+        //     }
+        // })
     })
 }
 
