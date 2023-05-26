@@ -15,16 +15,6 @@ const wsServer = new WebSocket.WebSocketServer({ port: 8080 });
 // const io = new Server(httpServer);
 const io = require("socket.io")(srv);
 
-const SerialPort = require('serialport').SerialPort;
-var esp = new SerialPort({
-    path: 'COM8',  
-    baudRate: 115200,
-    autoOpen: false,
-});
-esp.open((e) => {
-    console.log(`serial error: ${e}`);
-});
-
 const port = 80;
 
 app.use(express.static('./client/static'));
