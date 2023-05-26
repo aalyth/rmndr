@@ -27,6 +27,9 @@ async function load_messages(){
             ", " + notification_date.toLocaleTimeString() + 
             "</h3>" + "</div>" +"</div>"
         )
+        console.log('notification = ' + res[0].content);
+        console.log('time = ' + notification_date.toLocaleTimeString());
+        socket.emit('esp_notification', res[0].content, notification_date.toLocaleTimeString());
 
         for (notification of res){
 
@@ -40,37 +43,27 @@ async function load_messages(){
 
             list.appendChild(newNotification);
             lower+=1;
-         }
+        }
 
-         upper+=30;
+        upper+=30;
 
-         // calculate the interval
-         var curr_time = new Date().getTime();
-         var curr_notif = new Date(res[0].time);
-         var curr_notif_time = curr_notif.getTime();
-         var interval = curr_notif_time - curr_time;
-         
-         // set up the interval to switch the upcoming notification
-         intervalId = setInterval(() => {
-            
-            socket.emit('connect_esp', res[0].content, curr_notif.toLocaleDateString() + ", " + curr_notif.toLocaleTimeString());
-            socket.on('esp_send', async (str) => {
-                socket.emit('esp_receive', str);
-            });
+        // calculate the interval
+        var curr_time = new Date().getTime();
+        var curr_notif = new Date(res[0].time);
+        var curr_notif_time = curr_notif.getTime();
+        var interval = curr_notif_time - curr_time;
 
-            socket.emit('delete_notification', user, curr_notif.toISOString());
-            socket.emit('has_notifications', user);
-            socket.on('notifications_fetch_result',  async (res) => {
-                if(!res) clearInterval(intervalId);
-            })
-
-            socket.emit('start_alarm');
-            location.reload();
-             
-         }, interval);
-
-     })
-
+        // set up the interval to switch the upcoming notification
+        socket.emit('has_notifications', user);
+        socket.on('notifications_fetch_result',  async (res) => {
+            if(res) {
+                setTimeout(() => {
+                    socket.emit('delete_notification', user, curr_notif.toISOString());
+                    location.reload();
+                }, interval);
+            }
+        })
+    })
 }
 
 
@@ -81,16 +74,16 @@ window.onload = async function () {
         window.location.href = '/auth';	
     }
 
-    if(list.scrollTop == 0){
-        load_messages();
-    }
+    load_messages();
 
+    /*
     list.addEventListener("scroll", async function () {
         if(list.scrollTop == 0){
-			var pre_load_height = list.offsetHeight;
+            var pre_load_height = list.offsetHeight;
             await load_messages();
-			var diff = list.offsetHeight - pre_load_height;
-			if (diff > 0) list.scrollTop = diff;
+            var diff = list.offsetHeight - pre_load_height;
+            if (diff > 0) list.scrollTop = diff;
         }
     })
+    */
 }

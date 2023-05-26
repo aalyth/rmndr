@@ -124,7 +124,7 @@ async function delete_notification(user_id, time){
 }
 
 async function has_notification(user_id){
-    const params = [user_id, time];
+    const params = [user_id];
     const query = 'SELECT * FROM app_data.notification WHERE user_id = ?'
 
     var hasNotifications =  !( (await client.execute(query, params)).rows.length == 0 )

@@ -15,4 +15,5 @@ submit.addEventListener("click", async function(){
     console.log(dateValue.toISOString());
     socket.emit("postNotification", user, dateValue, description.value);
     document.getElementsByClassName("reminder-content")[0].reset();
+    window.location.href = '/';
 })

@@ -15,6 +15,16 @@ const wsServer = new WebSocket.WebSocketServer({ port: 8080 });
 // const io = new Server(httpServer);
 const io = require("socket.io")(srv);
 
+const SerialPort = require('serialport').SerialPort;
+var esp = new SerialPort({
+    path: 'COM8',  
+    baudRate: 115200,
+    autoOpen: false,
+});
+esp.open((e) => {
+    console.log(`serial error: ${e}`);
+});
+
 const port = 80;
 
 app.use(express.static('./client/static'));
@@ -31,7 +41,6 @@ app.get('/remind', (req, res) => {
 	res.sendFile('/client/html/reminder.html', { root: './' });
 });
 
-response = '';
 io.on('connection', (socket) => {
 	console.log('a user connected');
 	socket.room = '';
@@ -42,28 +51,18 @@ io.on('connection', (socket) => {
 
 	socket.on('remind', (msg) => {
 		response = msg;
+        esp.write('huj');
+        console.log('writing huj');
 	});
 
-	socket.on('connect_esp', async (notification, time) => {
-		
-		function centerText(text) {
-
-			if (text.length > 14) {
-			  text = text.substring(0, 14);
-			}
-
-			const totalSpaces = 16 - text.length;
-			const leftSpaces = Math.floor(totalSpaces / 2);
-			const rightSpaces = totalSpaces - leftSpaces;
-			const centeredText = " ".repeat(leftSpaces) + text + " ".repeat(rightSpaces);
-			 
-			return centeredText;
-		}
-
-		socket.emit('esp_send', centerText(notification+time));
-		
+	socket.on('esp_notification', (notification, time) => {
+        // esp.write('cN ' + notification + ' ' + time);
 	});
 
+	socket.on('esp_alarm', () => {
+        console.log('we start the alarm');
+        esp.write('startAlarm');
+	})
 	
 	/*
 	 socket.on('postNotification', async (user, time, content) => {
@@ -87,6 +86,7 @@ io.on('connection', (socket) => {
 		socket.emit('register_resp', res);
 	})
 	
+
 	 socket.on('get_notifications', async(user, lower_bound, upper_bound) => {
 		var res = await database.load_notifications(user, lower_bound, upper_bound);
 		socket.emit('post_notifications', res);
@@ -98,6 +98,9 @@ io.on('connection', (socket) => {
 
 	socket.on('delete_notification', async(user_id, time) => {
 		await database.delete_notification(user_id, time);
+        console.log('we deleted the notification');
+        console.log('we start the alarm');
+        esp.write('startAlarm');
 	})
 
 	socket.on('has_notifications', async(user_id) => {
