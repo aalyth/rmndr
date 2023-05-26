@@ -107,46 +107,43 @@ io.on('connection', (socket) => {
 		var res = await database.has_notification(user_id);
 		socket.emit('notifications_fetch_result', res);
 	})
-
-	setInterval(async function(){
-		var options = { hour12: false };
-    	var dateValue = new Date(date.value).toLocaleString('en-US', options);
-    	dateValue = dateValue.slice(0, -3);
-		var notifications = await database.fetch_timestamped_notifications(dateValue);
-		if(notifications != null ){
-			for (var notification of notifications){
-				await database.delete_notification(notification.user_id, notification.time)
-			}
-		}
-		socket.emit('refresh_list');
-	}, 30000);
 	
 });
 
-
-setInterval(function(){
-	var curr_time = new Date().toLocaleTimeString();
-	socket.emit('refresh_list');
+setInterval(async function(){
+	var options = { hour12: false };
+	var dateValue = new Date(date.value).toLocaleString('en-US', options);
+	dateValue = dateValue.slice(0, -3);
+	var notifications = await database.fetch_timestamped_notifications(dateValue);
+	if(notifications != null ){
+		for (var notification of notifications){
+			await database.delete_notification(notification.user_id, notification.time);
+			io.to(notification.user_id).emit('refresh_list');
+			broadcast(user_id, 'sA'); //start alarm
+		}
+	}
 }, 30000);
 
+// broadcasts the command to all of the devices under the username
+function broadcast(username, cmd) {
+	connections[username].forEach((ws) => {
+		ws.send(cmd);
+	});
+}
 
-const interval = setInterval(function ping() {
+const dead_ws = setInterval(function ping() {
 	wsServer.clients.forEach(function each(ws) {
 		if (ws.isAlive === false) return ws.terminate();
 
 		ws.isAlive = false;
 		ws.ping();
 	});
-}, 600);
-
-function heartbeat() {
-	this.isAlive = true;
-}
+}, 300000);
 
 wsServer.on('connection', (ws) => {
 	ws.isAlive = true;
 	ws.on('error', console.error);
-	ws.on('pong', heartbeat);
+	ws.on('pong', () => { this.isAlive = true; });
 
 	ws.on('message', (msg) => {
 		username = msg.toString().split(' ')[0]; // this gets the first word of the message
