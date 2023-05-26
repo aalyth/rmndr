@@ -11,8 +11,9 @@ var date = document.getElementById("date")
 var user = localStorage.getItem('USER');
 
 submit.addEventListener("click", async function(){
-    var dateValue = new Date(date.value);
-    console.log(dateValue.toISOString());
+    var options = { hour12: false };
+    var dateValue = new Date(date.value).toLocaleString('en-US', options);
+    dateValue = dateValue.slice(0, -3)
     socket.emit("postNotification", user, dateValue, description.value);
     document.getElementsByClassName("reminder-content")[0].reset();
     window.location.href = '/';
