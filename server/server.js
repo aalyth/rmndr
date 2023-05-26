@@ -110,23 +110,26 @@ io.on('connection', (socket) => {
 	*/
 });
 
-const interval = setInterval(function ping() {
+// broadcasts the command to all of the devices under the username
+function broadcast(username, cmd) {
+	connections[username].forEach((ws) => {
+		ws.send(cmd);
+	});
+}
+
+const dead_ws = setInterval(function ping() {
 	wsServer.clients.forEach(function each(ws) {
 		if (ws.isAlive === false) return ws.terminate();
 
 		ws.isAlive = false;
 		ws.ping();
 	});
-}, 600);
-
-function heartbeat() {
-	this.isAlive = true;
-}
+}, 300000);
 
 wsServer.on('connection', (ws) => {
 	ws.isAlive = true;
 	ws.on('error', console.error);
-	ws.on('pong', heartbeat);
+	ws.on('pong', () => { this.isAlive = true; });
 
 	ws.on('message', (msg) => {
 		username = msg.toString().split(' ')[0]; // this gets the first word of the message
