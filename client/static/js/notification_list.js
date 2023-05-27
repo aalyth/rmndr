@@ -70,18 +70,17 @@ async function load_messages(){
     })
 }
 
+socket.on('refresh_list', async () => {
+    location.reload();
+});
 
 window.onload = async function () {
-
+    socket.emit('changeRoom', user);
     if (!localStorage.getItem('USER')){
         console.log("item")
         window.location.href = '/auth';	
     }
 
-	socket.on('refresh_list', () => {
-		location.reload();
-		console.log('les goo');
-	});
 
     load_messages();
 

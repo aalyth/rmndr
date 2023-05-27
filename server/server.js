@@ -11,6 +11,7 @@ const srv = require("http").Server(app);
 const httpServer = createServer(app);
 const connections = {}; // this maps usernames to connected 
 const WebSocket = require('ws');
+const { delay } = require('rxjs');
 const wsServer = new WebSocket.WebSocketServer({ port: 8080 });
 
 // const io = new Server(httpServer);
@@ -104,21 +105,34 @@ setInterval(async function(){
 	var options = { hour12: false };
 	var dateValue = new Date().toLocaleString('en-Gb', options);
 	dateValue = dateValue.slice(0, -3);
-
+	var dateRaw = dateValue.split('/');
+    dateValue = dateRaw[1] + '/' + dateRaw[0] + '/' + dateRaw[2];
 	console.log('dateValue = ');
 	console.log(dateValue);
 
 	var notifications = await database.fetch_timestamped_notifications(dateValue);
+	var nextNotifications = [];
 	console.log('notifications = ');
 	console.log(notifications);
 	if(notifications != null ){
 		for (var notification of notifications){
 			await database.delete_notification(notification.user_id, notification.time);
-			io.to(notification.user_id).emit('refresh_list');
-
+			console.log(notification.user_id);
 			// TODO: broadcast properly
+			io.to(notification.user_id).emit('refresh_list');
+			nextNotifications.push(database.fetch_next_notification(notification.user_id));
 			//broadcast(notification.user_id, 'sA'); //start alarm
 		}
+	await delay(10000);
+	for(var notification of nextNotifications){
+		notification.time = new Date(notification.time).toLocaleString('en-Gb', options);
+		notification.time = notification.time.slice(0, -3);
+		var dateRaw = notification.time.split('/');
+		var yearHr = dateRaw[2].split(' ');
+		notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
+		//broadcast(notification.user_id, "cN " + notification.content + " " + notification.time)
+	}
+
 	}
 }, 30000);
 

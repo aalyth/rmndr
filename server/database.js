@@ -150,7 +150,32 @@ async function fetch_timestamped_notifications(time){
 	}
 	return null;
 }
-module.exports = {cassandra, client, connect, register_user, login_user, post_notification, load_notifications, delete_notification, has_notification, fetch_timestamped_notifications};
+
+async function fetch_next_notification(user_id){
+	const query = 'SELECT * FROM app_data.notification WHERE user_id = ?';
+	const params = [user_id];
+
+	var notifications = (await client.execute(query, params)).rows.map((row) => {
+		return { 
+			user_id : row.user_id,
+			content: row.content,
+			time: new Date(row.time).getTime()
+		};
+	});
+
+	notifications = notifications.sort((a, b) => a.time - b.time);
+	return notifications[0];
+
+
+}
+module.exports = {
+	cassandra, client, 
+	connect, register_user, 
+	login_user, post_notification, 
+	load_notifications, delete_notification, 
+	has_notification, fetch_timestamped_notifications,
+	fetch_next_notification
+};
 
 connect();
 
