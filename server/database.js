@@ -118,14 +118,14 @@ async function load_notifications(user_id, lower_limit, upper_limit){
 
 async function delete_notification(user_id, time){
     const params = [user_id, time];
-    const query = 'DELETE FROM app_data.notification WHERE user_id = ? AND time = ?'
+    const query = 'DELETE FROM notification WHERE user_id = ? AND time = ?'
 
     client.execute(query, params);
 }
 
 async function has_notification(user_id){
     const params = [user_id];
-    const query = 'SELECT * FROM app_data.notification WHERE user_id = ?'
+    const query = 'SELECT * FROM notification WHERE user_id = ?'
 
     var hasNotifications =  !( (await client.execute(query, params)).rows.length == 0 )
 
@@ -134,7 +134,7 @@ async function has_notification(user_id){
 
 async function fetch_timestamped_notifications(time){
 	const params = [time]
-	const query = 'SELECT * FROM app_data.notification WHERE time = ? ALLOW FILTERING'
+	const query = 'SELECT * FROM notification WHERE time = ? ALLOW FILTERING'
 
 	var notifications = await client.execute(query, params)
 	var hasNotifications =  !( notifications.rows.length == 0 )

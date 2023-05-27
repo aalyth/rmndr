@@ -120,16 +120,18 @@ setInterval(async function(){
 			console.log(notification.user_id);
 			// TODO: broadcast properly
 			io.to(notification.user_id).emit('refresh_list');
-			nextNotifications.push(database.load_notifications(notification.user_id, 0, 1)[0]);
+			var nextNotification = await database.load_notifications(notification.user_id, 0, 1);
+			nextNotifications.push(nextNotification[0]);
 			//broadcast(notification.user_id, 'sA'); //start alarm
 		}
-	await delay(10000);
+	//await delay(10000);
 	for(var notification of nextNotifications){
 		notification.time = new Date(notification.time).toLocaleString('en-Gb', options);
 		notification.time = notification.time.slice(0, -3);
 		var dateRaw = notification.time.split('/');
 		var yearHr = dateRaw[2].split(' ');
 		notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
+		console.log(notification);
 		//broadcast(notification.user_id, "cN " + notification.content + " " + notification.time)
 	}
 
