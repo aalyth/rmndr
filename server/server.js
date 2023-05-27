@@ -120,7 +120,7 @@ setInterval(async function(){
 			console.log(notification.user_id);
 			// TODO: broadcast properly
 			io.to(notification.user_id).emit('refresh_list');
-			nextNotifications.push(database.fetch_next_notification(notification.user_id));
+			nextNotifications.push(database.load_notifications(notification.user_id, 0, 1)[0]);
 			//broadcast(notification.user_id, 'sA'); //start alarm
 		}
 	await delay(10000);
