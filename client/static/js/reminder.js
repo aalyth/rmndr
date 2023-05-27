@@ -3,7 +3,6 @@ if (!localStorage.getItem('USER')){
     window.location.href = '/auth';	
 }
 
-
 var socket = io();
 var submit = document.getElementById("submit");
 var description = document.getElementById("desc");
@@ -12,7 +11,7 @@ var user = localStorage.getItem('USER');
 
 submit.addEventListener("click", async function(){
     var options = { hour12: false };
-    var dateValue = new Date(date.value).toLocaleString('en-US', options);
+    var dateValue = new Date(date.value).toLocaleString('en-Gb', options);
     dateValue = dateValue.slice(0, -3)
     socket.emit("postNotification", user, dateValue, description.value);
     document.getElementsByClassName("reminder-content")[0].reset();

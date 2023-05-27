@@ -102,14 +102,22 @@ io.on('connection', (socket) => {
 
 setInterval(async function(){
 	var options = { hour12: false };
-	var dateValue = new Date(date.value).toLocaleString('en-US', options);
+	var dateValue = new Date().toLocaleString('en-Gb', options);
 	dateValue = dateValue.slice(0, -3);
+
+	console.log('dateValue = ');
+	console.log(dateValue);
+
 	var notifications = await database.fetch_timestamped_notifications(dateValue);
+	console.log('notifications = ');
+	console.log(notifications);
 	if(notifications != null ){
 		for (var notification of notifications){
 			await database.delete_notification(notification.user_id, notification.time);
 			io.to(notification.user_id).emit('refresh_list');
-			broadcast(user_id, 'sA'); //start alarm
+
+			// TODO: broadcast properly
+			//broadcast(notification.user_id, 'sA'); //start alarm
 		}
 	}
 }, 30000);

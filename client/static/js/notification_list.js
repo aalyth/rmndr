@@ -32,7 +32,6 @@ async function load_messages(){
         socket.emit('esp_notification', res[0].content, notification_date.toLocaleTimeString());
 
         for (notification of res){
-
             var newNotification = document.createElement("div");
             newNotification.className = "notification";
             newNotification.setAttribute("id", notification.time);
@@ -44,13 +43,8 @@ async function load_messages(){
             list.appendChild(newNotification);
             lower+=1;
         }
-
         upper+=30;
         
-
-        socket.on('refresh_list', async () => {
-            location.reload();
-        });
         // var notification = {
         //     curr_time : new Date().getTime(),
         //     curr_notif : new Date(res[0].time),
@@ -83,6 +77,11 @@ window.onload = async function () {
         console.log("item")
         window.location.href = '/auth';	
     }
+
+	socket.on('refresh_list', () => {
+		location.reload();
+		console.log('les goo');
+	});
 
     load_messages();
 
