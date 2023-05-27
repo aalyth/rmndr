@@ -155,16 +155,22 @@ async function fetch_next_notification(user_id){
 	const query = 'SELECT * FROM app_data.notification WHERE user_id = ?';
 	const params = [user_id];
 
-	var notifications = (await client.execute(query, params)).rows.map((row) => {
-		return { 
-			user_id : row.user_id,
-			content: row.content,
-			time: new Date(row.time).getTime()
-		};
-	});
+	var notifications = await client.execute(query, params)
+	var hasNotifications =  !( notifications.rows.length == 0 )
 
-	notifications = notifications.sort((a, b) => a.time - b.time);
-	return notifications[0];
+	if(hasNotifications){
+		var res = (notifications.rows.map((row) => {
+			return {
+				user_id : row.user_id,
+				content: row.content,
+				time: new Date(row.time).getTime()
+			}
+		}));
+		sortedRes = res.sort((a, b) => a.time - b.time);
+		return sortedRes[0];
+	}
+	
+	return null;
 
 
 }
