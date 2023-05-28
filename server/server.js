@@ -126,17 +126,23 @@ setInterval(async function(){
 			io.to(notification.user_id).emit('refresh_list');
 			var nextNotification = await database.load_notifications(notification.user_id, 0, 1);
 			nextNotifications.push(nextNotification[0]);
-			//broadcast(notification.user_id, 'sA'); //start alarm
+			console.log('notification in socket : ' + notification.user_id);
+			var notificationUser = await database.fetch_username(notification.user_id);
+			console.log("username : " + notificationUser); 
+			//broadcast(notificationUser, 'sA'); //start alarm
 		}
-	//await delay(10000);
-	for(var notification of nextNotifications){
-		notification.time = new Date(notification.time).toLocaleString('en-Gb', options);
-		notification.time = notification.time.slice(0, -3);
-		var dateRaw = notification.time.split('/');
-		var yearHr = dateRaw[2].split(' ');
-		notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
-		console.log(notification);
-		//broadcast(notification.user_id, "cN " + notification.content + " " + notification.time)
+	//await delay(10000)
+	if(nextNotifications.length!=0){
+		for(var notification of nextNotifications){
+			notification.time = new Date(notification.time).toLocaleString('en-Gb', options);
+			notification.time = notification.time.slice(0, -3);
+			var dateRaw = notification.time.split('/');
+			var yearHr = dateRaw[2].split(' ');
+			notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
+			console.log(notification);
+			var notificationUser = await database.fetch_username(notification.user_id); 
+			//broadcast(notificationUser, "cN " + notification.content + " " + notification.time)
+		}
 	}
 
 	}

@@ -24,6 +24,14 @@ async function fetch_uuid(username){
 	return (res.length != 0) ? res[0].id : null;
 }
 
+async function fetch_username(uuid){
+	const params = [uuid];
+	console.log("uuid in fetch: " + params[0]);
+	var res = (await client.execute("SELECT * FROM users WHERE user_id = ?", params)).rows;
+
+	return (res.length != 0) ? res[0].username : null;
+}
+
 async function connect() {
 	await client.connect();
 	console.log('Connected to Cassandra');
@@ -97,7 +105,8 @@ async function load_notifications(user_id, lower_limit, upper_limit){
 	const query = "SELECT * FROM notification WHERE user_id = ? LIMIT " + upper_limit;
 
 	var res = (await client.execute(query, params)).rows.map((row) => {
-		return { 
+		return {
+			user_id : row.user_id, 
             id: row.notification_id,
 			content: row.content,
 			time: new Date(row.time).getTime()
@@ -150,7 +159,7 @@ module.exports = {
 	login_user, post_notification, 
 	load_notifications, delete_notification, 
 	has_notification, fetch_timestamped_notifications,
-	fetch_uuid
+	fetch_uuid, fetch_username
 };
 
 connect();
