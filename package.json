@@ -12,7 +12,6 @@
   "dependencies": {
     "cassandra-driver": "^4.6.4",
     "express": "^4.18.2",
-    "serialport": "^10.5.0",
     "socket.io": "^2.3.0",
     "ws": "^8.13.0"
   }

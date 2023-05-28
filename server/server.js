@@ -11,7 +11,6 @@ const srv = require("http").Server(app);
 const httpServer = createServer(app);
 const connections = {}; // this maps usernames to connected 
 const WebSocket = require('ws');
-const { delay } = require('rxjs');
 const wsServer = new WebSocket.WebSocketServer({ port: 8080 });
 
 // const io = new Server(httpServer);
@@ -58,6 +57,20 @@ io.on('connection', (socket) => {
 	
 	 socket.on('postNotification', async (user, time, content) => {
 	 	await database.post_notification(user, time, content);
+
+		const notification = (await database.load_notifications(user, 0, 1))[0];
+		if (notification == undefined) {
+			broadcast(user, 'cN lacking notifications');
+
+		} else {
+			notification.time = new Date(notification.time).toLocaleString('en-Gb', { hour12: false});
+			notification.time = notification.time.slice(0, -3);
+			var dateRaw = notification.time.split('/');
+			var yearHr = dateRaw[2].split(' ');
+			notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
+
+			broadcast(user,  'cN ' + notification.content + ' ' + notification.time);
+		}
 	 });
 
 	socket.on('changeRoom', async (newRoom) => {
@@ -118,20 +131,52 @@ setInterval(async function(){
 		for (var notification of notifications){
 			await database.delete_notification(notification.user_id, notification.time);
 			console.log(notification.user_id);
-			// TODO: broadcast properly
 			io.to(notification.user_id).emit('refresh_list');
-			var nextNotification = await database.load_notifications(notification.user_id, 0, 1);
-			nextNotifications.push(nextNotification[0]);
-			//broadcast(notification.user_id, 'sA'); //start alarm
+
+			var nextNotification = (await database.load_notifications(notification.user_id, 0, 1))[0];
+			if (nextNotification == undefined) {
+				nextNotifications.push({
+					user_id: notification.user_id,
+					time: 0
+				});
+
+			} else {
+				nextNotifications.push(nextNotification);
+			}
+
+			broadcast(notification.user_id, 'sA'); //start alarm
 		}
-	//await delay(10000);
-	for(var notification of nextNotifications){
+
+		function sleep(ms) {
+			return new Promise((resolve) => {
+				setTimeout(resolve, ms);
+			});
+		}
+
+		await sleep(10000);
+
+		console.log(nextNotifications);
+		for(var notification of nextNotifications){
+			if (notification.time == 0) {
+				broadcast(notification.user_id, 'cN lacking notifications');
+
+			} else {
+				notification.time = new Date(notification.time).toLocaleString('en-Gb', { hour12: false});
+				notification.time = notification.time.slice(0, -3);
+				var dateRaw = notification.time.split('/');
+				var yearHr = dateRaw[2].split(' ');
+				notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
+
+				broadcast(notification.user_id,  'cN ' + notification.content + ' ' + notification.time);
+			}
+		/*
 		notification.time = new Date(notification.time).toLocaleString('en-Gb', options);
 		notification.time = notification.time.slice(0, -3);
 		var dateRaw = notification.time.split('/');
 		var yearHr = dateRaw[2].split(' ');
 		notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
 		console.log(notification);
+		*/
 		//broadcast(notification.user_id, "cN " + notification.content + " " + notification.time)
 	}
 
@@ -159,7 +204,7 @@ wsServer.on('connection', (ws) => {
 	ws.on('error', console.error);
 	ws.on('pong', () => { this.isAlive = true; });
 
-	ws.on('message', (msg) => {
+	ws.on('message', async (msg) => {
 		username = msg.toString().split(' ')[0]; // this gets the first word of the message
 
 		ws.username = username;
@@ -172,6 +217,21 @@ wsServer.on('connection', (ws) => {
 		
 		console.log('table after coming: \n');
 		console.log(connections);
+
+		var notification = (await database.load_notifications(username, 0, 1))[0];
+		console.log(notification);
+		if (notification == undefined) {
+			ws.send('cN lacking notifications');
+
+		} else {
+			notification.time = new Date(notification.time).toLocaleString('en-Gb', { hour12: false});
+			notification.time = notification.time.slice(0, -3);
+			var dateRaw = notification.time.split('/');
+			var yearHr = dateRaw[2].split(' ');
+			notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
+
+			ws.send('cN ' + notification.content + ' ' + notification.time);
+		}
 	});
 
 	ws.on('close', () => {
