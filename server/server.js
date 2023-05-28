@@ -208,6 +208,7 @@ wsServer.on('connection', (ws) => {
 
 	ws.on('message', async (msg) => {
 		username = msg.toString().split(' ')[0]; // this gets the first word of the message
+		username = username.replace(/(\r\n|\n|\r)/gm, ""); // this removes any \r or \n in the string
 
 		ws.username = username;
 		if (!connections.hasOwnProperty(username)) {
