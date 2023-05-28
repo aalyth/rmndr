@@ -8,7 +8,6 @@ const client = new cassandra.Client({
 });
 
 async function check_user(username){
-
     var params = [username];
     const queryExisting = "SELECT * FROM users WHERE username = ?";
 	var isExisting =  !( (await client.execute(queryExisting, params)).rows.length == 0 )
@@ -17,11 +16,10 @@ async function check_user(username){
 }
 
 async function fetch_uuid(username){
-
 	const params = [username];
 	var res = (await client.execute("SELECT * FROM users WHERE username = ?", params)).rows;
 
-	return (res.length != 0) ? res[0].id : null;
+	return (res.length != 0) ? res[0].user_id : null;
 }
 
 async function fetch_username(uuid){

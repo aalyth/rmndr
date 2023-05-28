@@ -58,9 +58,10 @@ io.on('connection', (socket) => {
 	 socket.on('postNotification', async (user, time, content) => {
 	 	await database.post_notification(user, time, content);
 
+		const username = (await database.fetch_username(user));
 		const notification = (await database.load_notifications(user, 0, 1))[0];
 		if (notification == undefined) {
-			broadcast(user, 'cN lacking notifications');
+			broadcast(username, 'cN lacking notifications');
 
 		} else {
 			notification.time = new Date(notification.time).toLocaleString('en-Gb', { hour12: false});
@@ -69,7 +70,7 @@ io.on('connection', (socket) => {
 			var yearHr = dateRaw[2].split(' ');
 			notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
 
-			broadcast(user,  'cN ' + notification.content + ' ' + notification.time);
+			broadcast(username,  'cN ' + notification.content + ' ' + notification.time);
 		}
 	 });
 
@@ -133,11 +134,10 @@ setInterval(async function(){
 	console.log(notifications);
 	if(notifications != null ){
 		for (var notification of notifications){
-			await database.delete_notification(notification.user_id, notification.time);
 			console.log(notification.user_id);
 			io.to(notification.user_id).emit('refresh_list');
 			
-			var nextNotification = (await database.load_notifications(notification.user_id, 0, 1))[0];
+			var nextNotification = (await database.load_notifications(notification.user_id, 0, 2))[1];
 			var notificationUser = await database.fetch_username(notification.user_id);
 			if (nextNotification == undefined) {
 				nextNotifications.push({
@@ -152,6 +152,7 @@ setInterval(async function(){
 			// console.log('notification in socket : ' + notification.user_id);
 			// console.log("username : " + notificationUser); 
 			broadcast(notificationUser, 'sA'); //start alarm
+			await database.delete_notification(notification.user_id, notification.time);
 		}
 	//await delay(10000)
 	function sleep(ms) {
@@ -163,6 +164,8 @@ setInterval(async function(){
 
 	if(nextNotifications.length!=0){
 		for(var notification of nextNotifications){
+			console.log('next notifs:');
+			console.log(notification);
 			if (notification.time == 0) {
 				broadcast(notification.user_id, 'cN lacking notifications');
 
@@ -179,10 +182,11 @@ setInterval(async function(){
 	}
 
 	}
-}, 30000);
+}, 10000);
 
 // broadcasts the command to all of the devices under the username
 function broadcast(username, cmd) {
+	if (connections[username] == undefined) return;
 	connections[username].forEach((ws) => {
 		ws.send(cmd);
 	});
@@ -216,7 +220,9 @@ wsServer.on('connection', (ws) => {
 		console.log('table after coming: \n');
 		console.log(connections);
 
-		var notification = (await database.load_notifications(username, 0, 1))[0];
+		var uuid = (await database.fetch_uuid(username));
+		console.log('uuid = ' + uuid);
+		var notification = (await database.load_notifications(uuid, 0, 1))[0];
 		console.log(notification);
 		if (notification == undefined) {
 			ws.send('cN lacking notifications');
