@@ -77,6 +77,10 @@ io.on('connection', (socket) => {
 		socket.emit('register_resp', res);
 	})
 	
+	socket.on('auth', async (user, userid) => {
+		var uid = await database.fetch_uuid(user);
+		socket.emit('auth_resp', (uid == null) ? false : (userid == uid));
+	})
 
 	 socket.on('get_notifications', async(user, lower_bound, upper_bound) => {
 		var res = await database.load_notifications(user, lower_bound, upper_bound);

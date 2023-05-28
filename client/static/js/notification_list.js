@@ -1,11 +1,11 @@
-if (!localStorage.getItem('USER')){
+if (!localStorage.getItem('UUID')){
     console.log("item")
     window.location.href = '/auth';	
 }
 
 var list = document.getElementsByClassName("notification-list")[0];
 var upcoming = document.getElementsByClassName("upcoming-notification")[0];
-var user = localStorage.getItem('USER');
+var user = localStorage.getItem('UUID');
 var socket = io();
 var upper = 30;
 var lower = 0;
@@ -76,7 +76,7 @@ socket.on('refresh_list', async () => {
 
 window.onload = async function () {
     socket.emit('changeRoom', user);
-    if (!localStorage.getItem('USER')){
+    if (!localStorage.getItem('UUID')){
         console.log("item")
         window.location.href = '/auth';	
     }

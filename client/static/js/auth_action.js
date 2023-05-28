@@ -1,4 +1,4 @@
-if (!!localStorage.getItem('USER')){
+if (!!localStorage.getItem('UUID')){
     console.log("item")
     window.location.href = '/';	
 }

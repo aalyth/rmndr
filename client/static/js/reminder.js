@@ -1,4 +1,4 @@
-if (!localStorage.getItem('USER')){
+if (!localStorage.getItem('UUID')){
     console.log("item")
     window.location.href = '/auth';	
 }
@@ -7,7 +7,7 @@ var socket = io();
 var submit = document.getElementById("submit");
 var description = document.getElementById("desc");
 var date = document.getElementById("date")
-var user = localStorage.getItem('USER');
+var user = localStorage.getItem('UUID');
 socket.emit('changeRoom', user);
 
 submit.addEventListener("click", async function(){

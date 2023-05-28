@@ -30,7 +30,7 @@ async function authenticate(socket, page, usernameValue, passwordValue){
 
 		if(res.code == 200){
             socket.emit('changeRoom', usernameValue);
-			window.localStorage.setItem("USER", usernameValue);
+            window.localStorage.setItem("UUID", res.id);
 			window.location.href = "/";
 			return true;
 		}
