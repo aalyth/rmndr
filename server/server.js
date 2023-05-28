@@ -90,6 +90,10 @@ io.on('connection', (socket) => {
 		socket.emit('register_resp', res);
 	})
 	
+	socket.on('auth', async (user, userid) => {
+		var uid = await database.fetch_uuid(user);
+		socket.emit('auth_resp', (uid == null) ? false : (userid == uid));
+	})
 
 	 socket.on('get_notifications', async(user, lower_bound, upper_bound) => {
 		var res = await database.load_notifications(user, lower_bound, upper_bound);
@@ -132,30 +136,32 @@ setInterval(async function(){
 			await database.delete_notification(notification.user_id, notification.time);
 			console.log(notification.user_id);
 			io.to(notification.user_id).emit('refresh_list');
-
+			
 			var nextNotification = (await database.load_notifications(notification.user_id, 0, 1))[0];
+			var notificationUser = await database.fetch_username(notification.user_id);
 			if (nextNotification == undefined) {
 				nextNotifications.push({
-					user_id: notification.user_id,
+					user_id: notificationUser,
 					time: 0
 				});
 
 			} else {
+				nextNotification.user_id = notificationUser;
 				nextNotifications.push(nextNotification);
 			}
-
-			broadcast(notification.user_id, 'sA'); //start alarm
+			// console.log('notification in socket : ' + notification.user_id);
+			// console.log("username : " + notificationUser); 
+			broadcast(notificationUser, 'sA'); //start alarm
 		}
+	//await delay(10000)
+	function sleep(ms) {
+		return new Promise((resolve) => {
+			setTimeout(resolve, ms);
+		});
+	}
+	await sleep(10000);
 
-		function sleep(ms) {
-			return new Promise((resolve) => {
-				setTimeout(resolve, ms);
-			});
-		}
-
-		await sleep(10000);
-
-		console.log(nextNotifications);
+	if(nextNotifications.length!=0){
 		for(var notification of nextNotifications){
 			if (notification.time == 0) {
 				broadcast(notification.user_id, 'cN lacking notifications');
@@ -169,15 +175,7 @@ setInterval(async function(){
 
 				broadcast(notification.user_id,  'cN ' + notification.content + ' ' + notification.time);
 			}
-		/*
-		notification.time = new Date(notification.time).toLocaleString('en-Gb', options);
-		notification.time = notification.time.slice(0, -3);
-		var dateRaw = notification.time.split('/');
-		var yearHr = dateRaw[2].split(' ');
-		notification.time = dateRaw[1] + '/' + dateRaw[0] + '/' + yearHr[0] + yearHr[1];
-		console.log(notification);
-		*/
-		//broadcast(notification.user_id, "cN " + notification.content + " " + notification.time)
+		}
 	}
 
 	}
