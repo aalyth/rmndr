@@ -3,6 +3,13 @@ if (!localStorage.getItem('UUID')){
     window.location.href = '/auth';	
 }
 
+const today = new Date();// get local current date
+const dateToday = today.toLocaleString("EN-CA").slice(0,10);
+const timeNow = "T"+today.toLocaleTimeString("EN-GB").slice(0,5);
+document.querySelectorAll('input[type="datetime-local"]').forEach(el=>{
+    el.min = el.value = dateToday+timeNow;
+})
+
 var socket = io();
 var submit = document.getElementById("submit");
 var description = document.getElementById("desc");
